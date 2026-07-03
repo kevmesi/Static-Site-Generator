@@ -1,6 +1,6 @@
 import unittest
 from src.textnode import TextNode, TextType
-from src.share import *
+from src.nodeshare import *
 
 class testShare(unittest.TestCase):
 
@@ -288,5 +288,3 @@ class testShare(unittest.TestCase):
             TextNode("This is a smol text.", TextType.TEXT),
         ]
         self.assertEqual(text_nodes, expected_output)
-    
-

@@ -17,7 +17,6 @@ def text_to_textnodes(text: str) -> list[TextNode]:
     extract_links = split_nodes_link(extract_images)
     return extract_links
 
-
 def split_nodes_delimiter(old_nodes: list[TextNode], delimiter: str, text_type: TextType) -> list[TextNode]:
     """
     Return a new list of nodes, where any "text" type nodes in the input list are (potentially) split into multiple nodes based on the syntax.\n
