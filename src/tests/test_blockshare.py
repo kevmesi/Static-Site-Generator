@@ -1,4 +1,5 @@
 import unittest
+from src.leafnode import LeafNode
 from src.blockshare import *
 
 class TestBlockShare(unittest.TestCase):
@@ -123,4 +124,176 @@ class TestBlockShare(unittest.TestCase):
         self.assertEqual(BlockType.PARAGRAPH, block_to_blocktype(list_7))
         self.assertEqual(BlockType.PARAGRAPH, block_to_blocktype(list_8))
 
-    # TODO: Add tests for markdown_to_html_node, block_to_html_node, text_to_children, remove_markdown_from_block
+    # TODO: Add tests for markdown_to_html_node, block_to_html_node
+    # Tests for remove_markdown_from_block
+    def test_remove_markdown_from_block_heading(self):
+
+        block_heading_one = "# This is a heading"
+        block_heading_two = "## This is a heading"
+        block_heading_three = "### This is a heading"
+        block_heading_four = "#### This is a heading"
+        block_heading_five = "##### This is a heading"
+        block_heading_six = "###### This is a heading"
+
+        expected_result = "This is a heading"
+        self.assertEqual(expected_result, remove_markdown_from_block(block_heading_one, BlockType.HEADING))
+        self.assertEqual(expected_result, remove_markdown_from_block(block_heading_two, BlockType.HEADING))
+        self.assertEqual(expected_result, remove_markdown_from_block(block_heading_three, BlockType.HEADING))
+        self.assertEqual(expected_result, remove_markdown_from_block(block_heading_four, BlockType.HEADING))
+        self.assertEqual(expected_result, remove_markdown_from_block(block_heading_five, BlockType.HEADING))
+        self.assertEqual(expected_result, remove_markdown_from_block(block_heading_six, BlockType.HEADING))
+    
+    def test_remove_markdown_from_block_code(self):
+
+        block_code = "```\nThis is a block of code```"
+        expected_result = "This is a block of code"
+        self.assertEqual(expected_result, remove_markdown_from_block(block_code, BlockType.CODE))
+    
+    def test_remove_markdown_from_block_quote(self):
+
+        block_quote = """
+            > This is quote 1
+            > This is quote 2
+            >This is quote 3
+        """
+        expected_result = "This is quote 1\nThis is quote 2\nThis is quote 3"
+        self.assertEqual(expected_result, remove_markdown_from_block(block_quote, BlockType.QUOTE))
+    
+    def test_remove_markdown_from_block_unordered_list(self):
+
+        block_unordered = """
+            - This is item 1
+            - This is item 2
+            - This is item 3
+        """
+        expected_result = "This is item 1\nThis is item 2\nThis is item 3"
+        self.assertEqual(expected_result, remove_markdown_from_block(block_unordered, BlockType.UNORDERED_LIST))
+    
+    def test_remove_markdown_from_block_ordered_list(self):
+
+        block_ordered = """
+            1. This is item 1
+            2. This is item 2
+            3. This is item 3
+        """
+        expected_result = "This is item 1\nThis is item 2\nThis is item 3"
+        self.assertEqual(expected_result, remove_markdown_from_block(block_ordered, BlockType.ORDERED_LIST))
+
+    # Tests for text_to_children
+    def test_text_to_children_heading(self):
+
+        block = "This is a **bold** and _italic_ heading"
+        expected_children = [
+            LeafNode(None, "This is a "),
+            LeafNode("b", "bold"),
+            LeafNode(None, " and "),
+            LeafNode("i", "italic"),
+            LeafNode(None, " heading"),
+        ]
+        expected_result = [
+            ParentNode(None, expected_children) # type: ignore
+        ]
+        self.assertEqual(expected_result, text_to_children(block, BlockType.HEADING))
+
+    def test_text_to_children_unordered_and_ordered_list(self):
+        
+        block = "This is **item** 1\nThis is _item_ 2\nThis is item 3"
+        expected_quote_child_1 = [
+            LeafNode(None, "This is "),
+            LeafNode("b", "item"),
+            LeafNode(None, " 1"),
+        ]
+        expected_quote_child_2 = [
+            LeafNode(None, "This is "),
+            LeafNode("i", "item"),
+            LeafNode(None, " 2"),
+        ]
+        expected_quote_child_3 = [
+            LeafNode(None, "This is item 3"),
+        ]
+        expected_result = [
+            ParentNode("li", expected_quote_child_1), # type: ignore
+            ParentNode("li", expected_quote_child_2), # type: ignore
+            ParentNode("li", expected_quote_child_3), # type: ignore
+        ]
+        self.assertEqual(expected_result, text_to_children(block, BlockType.UNORDERED_LIST))
+        self.assertEqual(expected_result, text_to_children(block, BlockType.ORDERED_LIST))
+
+    def test_text_to_children_quote(self):
+        
+        block = "This is **quote** 1\nThis is _quote_ 2\nThis is quote 3"
+        expected_quote_child_1 = [
+            LeafNode(None, "This is "),
+            LeafNode("b", "quote"),
+            LeafNode(None, " 1"),
+        ]
+        expected_quote_child_2 = [
+            LeafNode(None, "This is "),
+            LeafNode("i", "quote"),
+            LeafNode(None, " 2"),
+        ]
+        expected_quote_child_3 = [
+            LeafNode(None, "This is quote 3"),
+        ]
+        expected_result = [
+            ParentNode(None, expected_quote_child_1), # type: ignore
+            ParentNode(None, expected_quote_child_2), # type: ignore
+            ParentNode(None, expected_quote_child_3), # type: ignore
+        ]
+        self.assertEqual(expected_result, text_to_children(block, BlockType.QUOTE))
+
+    def test_text_to_children_paragraph(self):
+        
+        block = "This is **line** 1\nThis is _line_ 2\nThis is line 3"
+        expected_quote_child_1 = [
+            LeafNode(None, "This is "),
+            LeafNode("b", "line"),
+            LeafNode(None, " 1"),
+        ]
+        expected_quote_child_2 = [
+            LeafNode(None, "This is "),
+            LeafNode("i", "line"),
+            LeafNode(None, " 2"),
+        ]
+        expected_quote_child_3 = [
+            LeafNode(None, "This is line 3"),
+        ]
+        expected_result = [
+            ParentNode("p", expected_quote_child_1), # type: ignore
+            ParentNode("p", expected_quote_child_2), # type: ignore
+            ParentNode("p", expected_quote_child_3), # type: ignore
+        ]
+        self.assertEqual(expected_result, text_to_children(block, BlockType.PARAGRAPH))    
+
+    # Tests for markdown_to_html_node
+    # def test_paragraphs(self):
+    #     md = """
+    #         This is **bolded** paragraph
+    #         text in a p
+    #         tag here
+
+    #         This is another paragraph with _italic_ text and `code` here
+
+    #         """
+
+    #     node = markdown_to_html_node(md)
+    #     html = node.to_html()
+    #     self.assertEqual(
+    #         html,
+    #         "<div><p>This is <b>bolded</b> paragraph text in a p tag here</p><p>This is another paragraph with <i>italic</i> text and <code>code</code> here</p></div>",
+    #     )
+
+    # def test_codeblock(self):
+    #     md = """
+    #         ```
+    #             This is text that _should_ remain
+    #             the **same** even with inline stuff
+    #         ```
+    #     """
+
+    #     node = markdown_to_html_node(md)
+    #     html = node.to_html()
+    #     self.assertEqual(
+    #         html,
+    #         "<div><pre><code>This is text that _should_ remain\nthe **same** even with inline stuff\n</code></pre></div>",
+    #     )

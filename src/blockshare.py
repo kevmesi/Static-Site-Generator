@@ -113,24 +113,30 @@ def remove_markdown_from_block(block: str, block_type: BlockType) -> str:
 
         case BlockType.QUOTE:
             block_lines = block.splitlines()
+            modified_lines = []
             for line in block_lines:
-                line = line.removeprefix("> ").removeprefix(">")
-            return "\n".join(block_lines)
+                if len(line.strip()) > 0:
+                    modified_lines.append(line.strip().removeprefix("> ").removeprefix(">"))
+            return "\n".join(modified_lines)
             
         case BlockType.UNORDERED_LIST:
             block_lines = block.splitlines()
+            modified_lines = []
             for line in block_lines:
-                line = line.removeprefix("- ")
-            return "\n".join(block_lines)
+                if len(line.strip()) > 0:
+                    modified_lines.append(line.strip().removeprefix("- "))
+            return "\n".join(modified_lines)
 
         case BlockType.ORDERED_LIST:
             block_lines = block.splitlines()
-            index = 0
+            index = 1
+            modified_lines = []
             for line in block_lines:
-                prefix = str(index) + ". "
-                line = line.removeprefix(prefix)
-                index += 1
-            return "\n".join(block_lines)
+                if len(line.strip()) > 0:
+                    prefix = str(index) + ". "
+                    modified_lines.append(line.strip().removeprefix(prefix))
+                    index += 1
+            return "\n".join(modified_lines)
         
         case _:
             return block
