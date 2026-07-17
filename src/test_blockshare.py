@@ -1,7 +1,6 @@
 import unittest
 
-from src.blockshare import *
-
+from blockshare import *
 
 class TestMarkdownToHTML(unittest.TestCase):
     def test_markdown_to_blocks(self):
@@ -158,6 +157,39 @@ the **same** even with inline stuff
             html,
             "<div><pre><code>This is text that _should_ remain\nthe **same** even with inline stuff\n</code></pre></div>",
         )
+
+    # Tests for extract_title
+    def test_extract_title_simple(self):
+        markdown = "# Heading"
+        expected_result = "Heading"
+        result = extract_title(markdown)
+        self.assertEqual(expected_result, result)
+
+    def test_extract_title_complex(self):
+        markdown = """
+            This is not a heading.
+            #Still not a heading
+            ## Nope
+            Some random words with # hasthag
+            # Heading
+
+            # Second heading
+            # Final heading
+            TADAA
+        """
+        expected_result = "Heading"
+        result = extract_title(markdown)
+        self.assertEqual(expected_result, result)
+
+    def test_extract_title_error(self):
+        markdown = """
+            This is not a heading.
+            #Still not a heading
+            ## Nope
+            Some random words with # hasthag
+            No headings at all in this markdown
+        """
+        self.assertRaises(ValueError, extract_title, markdown)
 
 
 if __name__ == "__main__":

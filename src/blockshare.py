@@ -1,9 +1,9 @@
 from enum import Enum
 
-from src.htmlnode import HTMLNode
-from src.nodeshare import text_to_textnodes
-from src.parentnode import ParentNode
-from src.textnode import TextNode, TextType, text_node_to_html_node
+from htmlnode import HTMLNode
+from nodeshare import text_to_textnodes
+from parentnode import ParentNode
+from textnode import TextNode, TextType, text_node_to_html_node
 
 
 
@@ -26,6 +26,14 @@ def markdown_to_blocks(markdown: str) -> list[str]:
         filtered_blocks.append(block)
     return filtered_blocks
 
+def extract_title(markdown: str) -> str:
+
+    markdown_lines = markdown.splitlines()
+    for line in markdown_lines:
+        if line.strip().startswith("# "):
+            return line.strip().removeprefix("# ")
+
+    raise ValueError("No heading in markdown")
 
 def block_to_block_type(block: str) -> BlockType:
     lines = block.split("\n")

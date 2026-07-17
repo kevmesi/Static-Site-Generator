@@ -1,6 +1,6 @@
 import unittest
-from src.textnode import TextNode, TextType
-from src.nodeshare import *
+from textnode import TextNode, TextType
+from nodeshare import *
 
 class testShare(unittest.TestCase):
 
